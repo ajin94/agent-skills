@@ -1,0 +1,9 @@
+{
+  "name": "agent-skills",
+  "description": "A SOLID-principled collection of Claude Code skills for common engineering workflows",
+  "version": "1.0.0",
+  "author": {
+    "name": "ajin",
+    "email": "ajinsanut@gmail.com"
+  }
+}
