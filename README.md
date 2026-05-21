@@ -10,7 +10,7 @@ A SOLID-principled Claude Code plugin providing reusable skills for common engin
 | `code-review` | `/agent-skills:code-review` | Review code quality for a file or diff |
 | `run-tests` | `/agent-skills:run-tests [pattern]` | Run tests, optionally filtered by pattern |
 | `deploy-app` | `/agent-skills:deploy-app <env>` | Deploy to a target environment |
-| `gather-requirements` | `/agent-skills:gather-requirements <file>` | Convert a file into a structured LLM-readable requirements doc in knowledgeBase |
+| `gather-requirements` | `/agent-skills:gather-requirements <file>` | Convert a file into a structured LLM-readable requirements doc in knowledgeBase/requirements/\<project\>/ |
 
 ## SOLID Design
 

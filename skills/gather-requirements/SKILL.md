@@ -1,7 +1,7 @@
 ---
 name: gather-requirements
-description: Read an input file and transform its content into a structured, LLM-readable requirements document. Saves to workspace/knowledgeBase/requirements/ and commits on a feature branch. Use when formalizing a spec, plan, rough notes, or brief into structured requirements.
-allowed-tools: Read Write Bash(git *) Bash(mkdir *) Bash(ls *) Bash(date *) AskUserQuestion
+description: Read an input file and transform its content into a structured, LLM-readable requirements document. Saves to workspace/knowledgeBase/requirements/<project-name>/. Use when formalizing a spec, plan, rough notes, or brief into structured requirements.
+allowed-tools: Read Write Bash(mkdir *) Bash(ls *) Bash(date *) AskUserQuestion
 arguments:
   - name: input_file
     description: Path to the input file to convert into a requirements document (e.g. brief.txt, spec.md, notes.txt)
@@ -10,7 +10,7 @@ disable-model-invocation: false
 
 ## Overview
 
-Convert the raw content of `$input_file` into a structured, descriptive requirements document that an LLM agent can read and act on without access to the original file. Save it to the knowledgeBase, then commit it on a new feature branch.
+Convert the raw content of `$input_file` into a structured, descriptive requirements document that an LLM agent can read and act on without access to the original file. Save it to the knowledgeBase under the project's own subfolder.
 
 ---
 
@@ -59,7 +59,9 @@ If there are more than 4 blockers, proceed with the most reasonable assumptions,
 ## Step 4 — Generate the requirements document
 
 Derive a short, descriptive title for this requirement (e.g. "User Authentication Flow", "Payment Integration", "Admin Dashboard").
-Derive a URL-safe slug: lowercase, hyphens only, max 40 chars (e.g. `user-auth-flow`, `payment-integration`).
+Derive two identifiers from the input:
+- **Project name**: a short kebab-case folder name identifying the broader project or product (e.g. `ns-interiors`, `patternix`, `admin-portal`)
+- **Slug**: a kebab-case name for this specific requirement, max 40 chars (e.g. `user-auth-flow`, `payment-integration`)
 
 Write a complete requirements document using the template below. Every section must be written as full, standalone prose and structured lists — no shorthand, no "see above", no references to the original file — so the document is self-contained for an LLM reader.
 
@@ -138,45 +140,24 @@ Group related requirements under sub-headings (e.g. ### 3.1 Authentication) if t
 
 ## Step 5 — Save the document
 
-1. Ensure the output directory exists:
+1. Ensure the project subfolder exists:
 
-!`mkdir -p /Users/ajin/workspace/knowledgeBase/requirements`
+!`mkdir -p /Users/ajin/workspace/knowledgeBase/requirements/[project-name]`
 
 2. Get today's date:
 
 !`date +%Y-%m-%d`
 
 3. Save the document to:
-   `/Users/ajin/workspace/knowledgeBase/requirements/[slug]-[YYYY-MM-DD].md`
+   `/Users/ajin/workspace/knowledgeBase/requirements/[project-name]/[slug]-[YYYY-MM-DD].md`
 
 Use the Write tool to save the full document content.
 
 ---
 
-## Step 6 — Version control: create feature branch and commit
-
-1. Check if knowledgeBase is a git repository:
-
-!`git -C /Users/ajin/workspace/knowledgeBase rev-parse --git-dir 2>/dev/null && echo "IS_GIT" || echo "NOT_GIT"`
-
-2. If NOT_GIT, initialize it:
-
-!`git -C /Users/ajin/workspace/knowledgeBase init && git -C /Users/ajin/workspace/knowledgeBase commit --allow-empty -m "chore: initialize knowledgeBase repository"`
-
-3. Create and switch to a new feature branch named `feature/req-[slug]`:
-
-!`git -C /Users/ajin/workspace/knowledgeBase checkout -b "feature/req-[slug]"`
-
-4. Stage and commit the requirement file:
-
-!`git -C /Users/ajin/workspace/knowledgeBase add requirements/[slug]-[YYYY-MM-DD].md && git -C /Users/ajin/workspace/knowledgeBase commit -m "feat(requirements): add [Title] requirement doc"`
-
----
-
-## Step 7 — Report to the user
+## Step 6 — Report to the user
 
 Summarize in 3–4 lines:
 - The file path where the document was saved
-- The git branch created
 - A one-sentence summary of what was captured
 - Any open questions or assumptions the user should review
