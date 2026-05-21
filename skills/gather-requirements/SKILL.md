@@ -1,7 +1,7 @@
 ---
 name: gather-requirements
-description: Read an input file and transform its content into a structured, LLM-readable requirements document. Saves to workspace/knowledgeBase/requirements/<project-name>/. Use when formalizing a spec, plan, rough notes, or brief into structured requirements.
-model: sonnet
+description: Read an input file and transform its content into a structured, LLM-readable requirements document. Prompts the user for an output directory (with a sensible default) before saving. Use when formalizing a spec, plan, rough notes, or brief into structured requirements.
+model: sonnet  # Required for Steps 1–4 (exploration, clarification, drafting). Step 5 is mechanical I/O and would run on a smaller model if per-step model selection were supported.
 allowed-tools: Read Write Bash(mkdir *) Bash(ls *) Bash(date *) AskUserQuestion
 arguments:
   - name: input_file
@@ -11,7 +11,11 @@ disable-model-invocation: false
 
 ## Overview
 
-Convert the raw content of `$input_file` into a structured, descriptive requirements document that an LLM agent can read and act on without access to the original file. Save it to the knowledgeBase under the project's own subfolder.
+Convert the raw content of `$input_file` into a structured, descriptive requirements document that an LLM agent can read and act on without access to the original file. Save it to a user-confirmed output directory under the project's own subfolder.
+
+### Model usage
+
+This skill declares `model: sonnet` because Steps 1–4 — reading the input, clarifying ambiguities with the user, and drafting the structured requirements — require strong reasoning. Step 5 is purely file I/O and does not benefit from Sonnet; it runs under the same model only because Claude Code skills support exactly one `model:` field in frontmatter. Do not invoke this skill for tasks that consist only of saving or reformatting an existing requirements doc.
 
 ---
 
@@ -141,18 +145,28 @@ Group related requirements under sub-headings (e.g. ### 3.1 Authentication) if t
 
 ## Step 5 — Save the document
 
-1. Ensure the project subfolder exists:
+1. Determine the default output directory in this order:
+   - If the environment variable `REQUIREMENTS_DIR` is set, use it.
+   - Otherwise, if `./knowledgeBase/requirements/` exists relative to the current working directory, use that.
+   - Otherwise, fall back to `$HOME/knowledgeBase/requirements/`.
 
-!`mkdir -p /Users/ajin/workspace/knowledgeBase/requirements/[project-name]`
+2. Use `AskUserQuestion` to confirm the destination with the user. Present the computed default as the suggested path and allow them to override it with any absolute or relative path:
+   > "Where should I save the requirements document? Accept the default or provide a different path."
+   > Default: `<computed-default>/[project-name]/`
 
-2. Get today's date:
+3. Resolve the chosen path to an absolute path (expand `~` if present). Store it as `$output_dir`.
+
+4. Ensure the project subfolder exists:
+
+!`mkdir -p "$output_dir/[project-name]"`
+
+5. Get today's date:
 
 !`date +%Y-%m-%d`
 
-3. Save the document to:
-   `/Users/ajin/workspace/knowledgeBase/requirements/[project-name]/[slug]-[YYYY-MM-DD].md`
+6. Save the document to `$output_dir/[project-name]/[slug]-[YYYY-MM-DD].md` using the Write tool.
 
-Use the Write tool to save the full document content.
+7. Echo the final absolute path back so the user can locate the file.
 
 ---
 
