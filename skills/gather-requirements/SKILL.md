@@ -1,6 +1,7 @@
 ---
 name: gather-requirements
 description: Read an input file and transform its content into a structured, LLM-readable requirements document. Saves to workspace/knowledgeBase/requirements/<project-name>/. Use when formalizing a spec, plan, rough notes, or brief into structured requirements.
+model: sonnet
 allowed-tools: Read Write Bash(mkdir *) Bash(ls *) Bash(date *) AskUserQuestion
 arguments:
   - name: input_file
