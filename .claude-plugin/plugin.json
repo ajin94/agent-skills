@@ -5,5 +5,13 @@
   "author": {
     "name": "ajin",
     "email": "ajinsanut@gmail.com"
-  }
+  },
+  "repository": "https://github.com/ajin94/agent-skills",
+  "skills": [
+    "skills/summarize-changes",
+    "skills/code-review",
+    "skills/run-tests",
+    "skills/deploy-app",
+    "skills/gather-requirements"
+  ]
 }
